@@ -2,8 +2,19 @@
   "name": "hyperapp-apollo",
   "version": "0.1.0",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "src/index.js",
   "author": "Yuku TAKAHASHI <taka84u9@gmail.com>",
   "license": "MIT",
+  "keywords": [
+    "apollo",
+    "graphql",
+    "hyperapp"
+  ],
+  "files": [
+    "src",
+    "dist"
+  ],
   "scripts": {
     "build": "(rm -fr dist || true) && rollup -c",
     "format": "prettier --no-semi --parser typescript --write src/*.ts",
