@@ -15,7 +15,7 @@ export interface State {
 }
 
 export interface Actions {
-  fetch: (data: { id: string; ast: any }) => void
+  fetch: (data: { id: string; query: any; variables?: any }) => void
   setClient: (client: ApolloClient<any>) => void
   modules: {
     setData: (data: { id: string; data: any }) => void
@@ -27,7 +27,7 @@ export const state: State = {
 }
 
 export const actions: ActionsType<State, Actions> = {
-  fetch: ({ id, ast }) => async ({ client }, actions) => {
+  fetch: ({ id, query, variables }) => async ({ client }, actions) => {
     if (!client) {
       throw new Error("Missing ApolloClient")
     }
@@ -40,8 +40,15 @@ export const actions: ActionsType<State, Actions> = {
       }
     })
     try {
-      const data = await client.query({ query: ast })
-      actions.modules.setData({ id, data })
+      const response = await client.query({ query, variables })
+      actions.modules.setData({
+        id,
+        data: {
+          data: response.data,
+          errors: response.errors,
+          fetching: false
+        }
+      })
     } catch (error) {
       window.console.error(error)
     }
@@ -49,11 +56,7 @@ export const actions: ActionsType<State, Actions> = {
   setClient: client => ({ client }),
   modules: {
     setData: ({ id, data }) => ({
-      [id]: {
-        data: data.data,
-        errors: data.errors,
-        fetching: false
-      }
+      [id]: data
     })
   }
 }
