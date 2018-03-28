@@ -1,0 +1,32 @@
+{
+  "name": "hyperapp-apollo",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "Yuku TAKAHASHI <taka84u9@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "(rm -fr dist || true) && rollup -c",
+    "format": "prettier --no-semi --parser typescript --write src/*.ts",
+    "lint": "run-p lint:*",
+    "lint:prettier": "prettier --no-semi --parser typescript -l src/*.ts",
+    "lint:tslint": "tslint --project ."
+  },
+  "devDependencies": {
+    "apollo-client": "^2.2.8",
+    "hyperapp": "^1.2.5",
+    "npm-run-all": "^4.1.2",
+    "prettier": "^1.11.1",
+    "rollup": "^0.57.1",
+    "rollup-plugin-typescript2": "^0.12.0",
+    "rollup-plugin-uglify": "^3.0.0",
+    "tslint": "^5.9.1",
+    "tslint-config-prettier": "^1.10.0",
+    "typescript": "^2.8.1"
+  },
+  "peerDependencies": {
+    "apollo-client": "^2.2.8",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.8.0",
+    "hyperapp": "^1.2.5"
+  }
+}
