@@ -1,7 +1,7 @@
 {
   "name": "hyperapp-apollo",
-  "version": "0.0.0",
-  "main": "index.js",
+  "version": "0.1.0",
+  "main": "dist/index.js",
   "author": "Yuku TAKAHASHI <taka84u9@gmail.com>",
   "license": "MIT",
   "scripts": {
