@@ -23,6 +23,6 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/yuku-t/thyperapp-apolloextcomplete/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/yuku-t/hyperapp-apollo/compare/v0.2.0...HEAD
 [0.2.0]: https://github.com/yuku-t/hyperapp-apollo/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/yuku-t/hyperapp-apollo/compare/2134207...v0.1.0
