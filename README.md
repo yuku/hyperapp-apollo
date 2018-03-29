@@ -1,5 +1,8 @@
 # hyperapp-apollo
 
+[![NPM version](http://img.shields.io/npm/v/hyperapp-apollo.svg)](https://www.npmjs.com/package/hyperapp-apollo)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ffd3ee558d10c5ac6a7d/maintainability)](https://codeclimate.com/github/yuku-t/hyperapp-apollo/maintainability)
+
 Hyperapp Apollo allows you to fetch data from your GraphQL server and use it in building complex
 and reactive UIs using the Hyperapp framework.
 
