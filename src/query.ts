@@ -62,25 +62,24 @@ export const actions: ActionsType<State, Actions> = {
 
 let counter = 0
 
-function getRenderProps<Data, Variables>(
+function getRenderProps<Data>(
   state: apollo.State,
   actions: apollo.Actions,
-  id: string,
-  variables: Variables | undefined
+  id: string
 ) {
+  const observable =
+    state.query.modules[id] && state.query.modules[id].observable
   const currentResult: ApolloCurrentResult<Data> | null | undefined =
-    state.query.modules[id] &&
-    state.query.modules[id].observable &&
-    state.query.modules[id].observable!.currentResult()
+    observable && observable.currentResult()
   return {
-    variables: variables as Variables, // Apollo checks if undefined in runtime
+    variables: observable && (observable.variables as any),
     data:
       currentResult && Object.keys(currentResult.data).length
         ? (currentResult.data as Data)
         : null,
     errors: currentResult && currentResult.errors,
     loading: !!currentResult && currentResult.loading,
-    refetch: () => actions.query.refetch({ id, variables })
+    refetch: () => actions.query.refetch({ id })
   }
 }
 
@@ -101,11 +100,7 @@ const query = <Data = {}, Variables = {}>(
     { apollo: actions }
   ) => {
     const id = key ? `${tmp}[${key}]` : tmp
-    const vnode = h(
-      render,
-      getRenderProps<Data, Variables>(state, actions, id, variables),
-      []
-    )
+    const vnode = h(render, getRenderProps<Data>(state, actions, id), [])
     const origOncreate = vnode.attributes && (vnode.attributes as any).oncreate
     vnode.attributes = {
       ...vnode.attributes,
