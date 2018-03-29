@@ -95,12 +95,12 @@ const query = <Data = {}, Variables = {}>(
   { apollo: apollo.State },
   { apollo: apollo.Actions }
 > => {
-  const _id = `q${counter++}`
+  const tmp = `q${counter++}`
   return ({ variables, render, key }) => (
     { apollo: state },
     { apollo: actions }
   ) => {
-    const id = key ? `${_id}[${key}]` : _id
+    const id = key ? `${tmp}[${key}]` : tmp
     const vnode = h(
       render,
       getRenderProps<Data, Variables>(state, actions, id, variables),
@@ -112,6 +112,7 @@ const query = <Data = {}, Variables = {}>(
       key: id,
       oncreate: (element: HTMLElement) => {
         actions.initQuery({ id, query, variables })
+        // tslint:disable-next-line:no-unused-expression
         origOncreate && origOncreate(element)
       }
     } as any
