@@ -10,6 +10,7 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 ### Changed
 - Replace `graphql()` with `query()` for flexibility.
 - Rename `fetching` as `loading`.
+- Make `variables` prop of `<Query/>` optional.
 
 ## [0.1.0] - 2018-03-28
 ### Added

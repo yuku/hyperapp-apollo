@@ -10,14 +10,14 @@ function getRenderProps<Data, Variables>(
   state: State,
   actions: Actions,
   id: string,
-  variables: Variables
+  variables: Variables | undefined
 ) {
   const currentResult: ApolloCurrentResult<Data> | null | undefined =
     state.modules[id] &&
     state.modules[id].observable &&
     state.modules[id].observable!.currentResult()
   return {
-    variables,
+    variables: variables as Variables, // Apollo checks if undefined in runtime
     data:
       currentResult && Object.keys(currentResult.data).length
         ? (currentResult.data as Data)
@@ -32,7 +32,7 @@ const query = <Data = {}, Variables = {}>(
   query: any
 ): Component<
   {
-    variables: Variables
+    variables?: Variables
     render: Component<QueryAttributes<Data, Variables>, any, any>
   },
   { apollo: State },
