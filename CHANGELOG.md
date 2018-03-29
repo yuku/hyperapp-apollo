@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 
 ## [Unreleased]
+### Changed
+- Move hyperapp from peerDependencies to dependencies.
 
 ## [0.2.0] - 2018-03-29
 ### Changed
