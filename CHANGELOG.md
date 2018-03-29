@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 
 ## [Unreleased]
+### Added
+- Add hyperapp-apollo.js and hyperapp-apollo.min.js to dist files.
+
 ### Changed
 - Move hyperapp from peerDependencies to dependencies.
 

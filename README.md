@@ -8,6 +8,8 @@ and reactive UIs using the Hyperapp framework.
 
 ## Installation
 
+If your project is using npm, you can install [hyperapp-apollo](https://www.npmjs.com/package/hyperapp-apollo) package by npm command:
+
 ```bash
 # installing the preset package and hyperapp integration
 npm install --save hyperapp-apollo apollo-client-preset graphql-tag graphql
@@ -15,6 +17,10 @@ npm install --save hyperapp-apollo apollo-client-preset graphql-tag graphql
 # installing each piece independently
 npm install --save hyperapp-apollo apollo-client apollo-cache-inmemory apollo-link-http graphql-tag graphql
 ```
+
+### Distribution files
+- **dist/index.js** - The CommonJS version of this package. (default)
+- **dist/hyperapp-apollo.js**, **dist/hyperapp-apollo.min.js** - IIFE version of this package. This version exports itself to `window.HyperappApollo`.
 
 ## Usage
 
