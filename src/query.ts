@@ -9,12 +9,14 @@ import {
 import * as apollo from "./apollo"
 import { QueryAttributes } from "./types"
 
+export interface QueryModuleState {
+  result: ApolloQueryResult<any> | null
+  observable: ObservableQuery<any> | null
+}
+
 export interface State {
   modules: {
-    [id: string]: {
-      result: ApolloQueryResult<any> | null
-      observable: ObservableQuery<any> | null
-    }
+    [id: string]: QueryModuleState
   }
 }
 
@@ -29,7 +31,7 @@ export interface Actions {
   ) => void
   refetch: (data: { id: string; variables?: any }) => void
   modules: {
-    setData: (data: { id: string; data: any }) => void
+    setData: (data: { id: string; data: Partial<QueryModuleState> }) => void
   }
 }
 
@@ -38,20 +40,41 @@ export const state: State = {
 }
 
 export const actions: ActionsType<State, Actions> = {
-  init: ({ id, query, variables, client }) => async ({ modules }, actions) => {
+  init: ({
+    id,
+    query,
+    variables,
+    client
+  }: {
+    id: string
+    query: any
+    variables?: any
+    client: ApolloClient<any>
+  }) => ({ modules }, actions) => {
     if (!modules[id] || !modules[id].observable) {
       const observable = client.watchQuery({ query, variables })
       actions.modules.setData({ id, data: { observable } })
-      const result = await observable.result()
-      actions.modules.setData({ id, data: { result } })
+      observable
+        .result()
+        .then(result => actions.modules.setData({ id, data: { result } }))
     }
   },
-  refetch: ({ id, variables }) => async ({ modules }, actions) => {
-    const result = await modules[id].observable!.refetch(variables)
-    actions.modules.setData({ id, data: { result } })
+  refetch: ({ id, variables }: { id: string; variables?: any }) => (
+    { modules },
+    actions
+  ) => {
+    modules[id]
+      .observable!.refetch(variables)
+      .then(result => actions.modules.setData({ id, data: { result } }))
   },
   modules: {
-    setData: ({ id, data }) => state => ({
+    setData: ({
+      id,
+      data
+    }: {
+      id: string
+      data: Partial<QueryModuleState>
+    }) => state => ({
       [id]: {
         ...state[id],
         ...data
@@ -62,13 +85,12 @@ export const actions: ActionsType<State, Actions> = {
 
 let counter = 0
 
-function getRenderProps<Data>(
-  state: apollo.State,
-  actions: apollo.Actions,
+function getRenderProps<Data, Variables>(
+  state: State,
+  actions: Actions,
   id: string
-) {
-  const observable =
-    state.query.modules[id] && state.query.modules[id].observable
+): QueryAttributes<Data, Variables> {
+  const observable = state.modules[id] && state.modules[id].observable
   const currentResult: ApolloCurrentResult<Data> | null | undefined =
     observable && observable.currentResult()
   return {
@@ -79,7 +101,7 @@ function getRenderProps<Data>(
         : null,
     errors: currentResult && currentResult.errors,
     loading: !!currentResult && currentResult.loading,
-    refetch: () => actions.query.refetch({ id })
+    refetch: () => actions.refetch({ id })
   }
 }
 
@@ -100,7 +122,10 @@ const query = <Data = {}, Variables = {}>(
     { apollo: actions }
   ) => {
     const id = key ? `${tmp}[${key}]` : tmp
-    const vnode = h(render, getRenderProps<Data>(state, actions, id), [])
+    const vnode = h(
+      render,
+      getRenderProps<Data, Variables>(state.query, actions.query, id)
+    )
     const origOncreate = vnode.attributes && (vnode.attributes as any).oncreate
     vnode.attributes = {
       ...vnode.attributes,
