@@ -9,6 +9,7 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 ## [Unreleased]
 ### Added
 - Add hyperapp-apollo.js and hyperapp-apollo.min.js to dist files.
+- Enable to use `<Query/>` in a loop.
 
 ### Changed
 - Move hyperapp from peerDependencies to dependencies.

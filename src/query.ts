@@ -32,17 +32,19 @@ const query = <Data = {}, Variables = {}>(
   query: any
 ): Component<
   {
+    key?: string
     variables?: Variables
     render: Component<QueryAttributes<Data, Variables>, any, any>
   },
   { apollo: State },
   { apollo: Actions }
 > => {
-  const id = `q${counter++}`
-  return ({ variables, render }) => (
+  const _id = `q${counter++}`
+  return ({ variables, render, key }) => (
     { apollo: state },
     { apollo: actions }
   ) => {
+    const id = key ? `${_id}[${key}]` : _id
     const vnode = h(
       render,
       getRenderProps<Data, Variables>(state, actions, id, variables),
