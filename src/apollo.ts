@@ -1,52 +1,28 @@
 import { ActionsType } from "hyperapp"
-import { ApolloClient, ApolloQueryResult, ObservableQuery } from "apollo-client"
+import { ApolloClient } from "apollo-client"
+
+import * as query from "./query"
 
 export interface State {
   client?: ApolloClient<any>
-  modules: {
-    [id: string]: {
-      result: ApolloQueryResult<any> | null
-      observable: ObservableQuery<any> | null
-    }
-  }
+  query: query.State
 }
 
 export interface Actions {
-  init: (data: { id: string; query: any; variables?: any }) => void
-  refetch: (data: { id: string; variables?: any }) => void
-  setClient: (client: ApolloClient<any>) => void
-  modules: {
-    setData: (data: { id: string; data: any }) => void
-  }
+  initQuery: (data: { id: string; query: any; variables?: any }) => void
+  query: query.Actions
 }
 
 export const state: State = {
-  modules: {}
+  query: query.state
 }
 
 export const actions: ActionsType<State, Actions> = {
-  init: ({ id, query, variables }) => async ({ client, modules }, actions) => {
-    if (!modules[id] || !modules[id].observable) {
-      if (!client) {
-        throw new Error(`Cloud not find "client" in the state`)
-      }
-      const observable = client.watchQuery({ query, variables })
-      actions.modules.setData({ id, data: { observable } })
-      const result = await observable.result()
-      actions.modules.setData({ id, data: { result } })
+  initQuery: ({ id, query, variables }) => ({ client }, actions) => {
+    if (!client) {
+      throw new Error(`Cloud not find "client" in the state`)
     }
+    actions.query.init({ id, query, variables, client })
   },
-  refetch: ({ id, variables }) => async ({ modules }, actions) => {
-    const result = await modules[id].observable!.refetch(variables)
-    actions.modules.setData({ id, data: { result } })
-  },
-  setClient: client => ({ client }),
-  modules: {
-    setData: ({ id, data }) => state => ({
-      [id]: {
-        ...state[id],
-        ...data
-      }
-    })
-  }
+  query: query.actions
 }
