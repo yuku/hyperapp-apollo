@@ -6,11 +6,7 @@ import ApolloProp from "./ApolloProp"
 export interface State {
   client?: ApolloClient<any>
   modules: {
-    [id: string]: {
-      data: ApolloProp["data"]
-      errors: ApolloProp["errors"]
-      fetching: ApolloProp["fetching"]
-    }
+    [id: string]: Pick<ApolloProp, "data" | "errors" | "fetching">
   }
 }
 
