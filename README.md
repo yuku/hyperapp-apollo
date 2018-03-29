@@ -60,9 +60,9 @@ export const TodoApp = ({ userId }) => (
     variables={{
       userId
     }}
-    render={({ data, fetching, refetch }) => (
+    render={({ data, loading, refetch }) => (
       <div>
-        { fetching ?
+        { loading ?
           <div>loading...</div>
         :
           <div>

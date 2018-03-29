@@ -30,7 +30,7 @@ const query = <Data = {}>(
             ...(state.modules[id] || {
               data: null,
               errors: null,
-              fetching: false
+              loading: false
             }),
             refetch: () => actions.fetch({ id, query, variables })
           },

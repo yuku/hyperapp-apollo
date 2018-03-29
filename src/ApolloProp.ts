@@ -11,6 +11,6 @@ export default interface ApolloProp<T = any> {
         extensions?: any
       }[]
     | null
-  fetching: boolean
+  loading: boolean
   refetch: () => void
 }

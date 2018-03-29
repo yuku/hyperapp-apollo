@@ -9,6 +9,7 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 ## [Unreleased]
 ### Changed
 - Replace `graphql()` with `query()` for flexibility.
+- Rename `fetching` as `loading`.
 
 ## [0.1.0] - 2018-03-28
 ### Added

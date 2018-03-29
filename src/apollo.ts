@@ -6,7 +6,7 @@ import ApolloProp from "./ApolloProp"
 export interface State {
   client?: ApolloClient<any>
   modules: {
-    [id: string]: Pick<ApolloProp, "data" | "errors" | "fetching">
+    [id: string]: Pick<ApolloProp, "data" | "errors" | "loading">
   }
 }
 
@@ -32,7 +32,7 @@ export const actions: ActionsType<State, Actions> = {
       data: {
         data: null,
         errors: null,
-        fetching: true
+        loading: true
       }
     })
     try {
@@ -42,7 +42,7 @@ export const actions: ActionsType<State, Actions> = {
         data: {
           data: response.data,
           errors: response.errors,
-          fetching: false
+          loading: false
         }
       })
     } catch (error) {
