@@ -1,16 +1,39 @@
 import { h, Component } from "hyperapp"
+import { ApolloCurrentResult } from "apollo-client"
 
 import { State, Actions } from "./apollo"
-import ApolloProp from "./ApolloProp"
+import { QueryAttributes } from "./types"
 
 let counter = 0
 
-const query = <Data = {}>(
+function getRenderProps<Data, Variables>(
+  state: State,
+  actions: Actions,
+  id: string,
+  variables: Variables
+) {
+  const currentResult: ApolloCurrentResult<Data> | null | undefined =
+    state.modules[id] &&
+    state.modules[id].observable &&
+    state.modules[id].observable!.currentResult()
+  return {
+    variables,
+    data:
+      currentResult && Object.keys(currentResult.data).length
+        ? (currentResult.data as Data)
+        : null,
+    errors: currentResult && currentResult.errors,
+    loading: !!currentResult && currentResult.loading,
+    refetch: () => actions.refetch({ id, variables })
+  }
+}
+
+const query = <Data = {}, Variables = {}>(
   query: any
 ): Component<
   {
-    variables: { [name: string]: any }
-    render: Component<ApolloProp<Data>, any, any>
+    variables: Variables
+    render: Component<QueryAttributes<Data, Variables>, any, any>
   },
   { apollo: State },
   { apollo: Actions }
@@ -21,19 +44,12 @@ const query = <Data = {}>(
       "apollo-query",
       {
         key: id,
-        oncreate: () => actions.fetch({ id, query, variables })
+        oncreate: () => actions.init({ id, query, variables })
       },
       [
         h(
           render,
-          {
-            ...(state.modules[id] || {
-              data: null,
-              errors: null,
-              loading: false
-            }),
-            refetch: () => actions.fetch({ id, query, variables })
-          },
+          getRenderProps<Data, Variables>(state, actions, id, variables),
           []
         )
       ]

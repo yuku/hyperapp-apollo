@@ -23,6 +23,7 @@
     "lint:tslint": "tslint --project ."
   },
   "devDependencies": {
+    "@types/graphql": "^0.12.7",
     "apollo-client": "^2.2.8",
     "hyperapp": "^1.2.5",
     "npm-run-all": "^4.1.2",

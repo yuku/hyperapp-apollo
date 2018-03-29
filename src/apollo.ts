@@ -1,17 +1,19 @@
 import { ActionsType } from "hyperapp"
-import { ApolloClient } from "apollo-client"
-
-import ApolloProp from "./ApolloProp"
+import { ApolloClient, ApolloQueryResult, ObservableQuery } from "apollo-client"
 
 export interface State {
   client?: ApolloClient<any>
   modules: {
-    [id: string]: Pick<ApolloProp, "data" | "errors" | "loading">
+    [id: string]: {
+      result: ApolloQueryResult<any> | null
+      observable: ObservableQuery<any> | null
+    }
   }
 }
 
 export interface Actions {
-  fetch: (data: { id: string; query: any; variables?: any }) => void
+  init: (data: { id: string; query: any; variables?: any }) => void
+  refetch: (data: { id: string; variables?: any }) => void
   setClient: (client: ApolloClient<any>) => void
   modules: {
     setData: (data: { id: string; data: any }) => void
@@ -23,36 +25,28 @@ export const state: State = {
 }
 
 export const actions: ActionsType<State, Actions> = {
-  fetch: ({ id, query, variables }) => async ({ client }, actions) => {
-    if (!client) {
-      throw new Error("Missing ApolloClient")
-    }
-    actions.modules.setData({
-      id,
-      data: {
-        data: null,
-        errors: null,
-        loading: true
+  init: ({ id, query, variables }) => async ({ client, modules }, actions) => {
+    if (!modules[id] || !modules[id].observable) {
+      if (!client) {
+        throw new Error(`Cloud not find "client" in the state`)
       }
-    })
-    try {
-      const response = await client.query({ query, variables })
-      actions.modules.setData({
-        id,
-        data: {
-          data: response.data,
-          errors: response.errors,
-          loading: false
-        }
-      })
-    } catch (error) {
-      window.console.error(error)
+      const observable = client.watchQuery({ query, variables })
+      actions.modules.setData({ id, data: { observable } })
+      const result = await observable.result()
+      actions.modules.setData({ id, data: { result } })
     }
+  },
+  refetch: ({ id, variables }) => async ({ modules }, actions) => {
+    const result = await modules[id].observable!.refetch(variables)
+    actions.modules.setData({ id, data: { result } })
   },
   setClient: client => ({ client }),
   modules: {
-    setData: ({ id, data }) => ({
-      [id]: data
+    setData: ({ id, data }) => state => ({
+      [id]: {
+        ...state[id],
+        ...data
+      }
     })
   }
 }
