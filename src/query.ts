@@ -38,22 +38,27 @@ const query = <Data = {}, Variables = {}>(
   { apollo: State },
   { apollo: Actions }
 > => {
-  const id = `m${counter++}`
-  return ({ variables, render }) => ({ apollo: state }, { apollo: actions }) =>
-    h(
-      "apollo-query",
-      {
-        key: id,
-        oncreate: () => actions.init({ id, query, variables })
-      },
-      [
-        h(
-          render,
-          getRenderProps<Data, Variables>(state, actions, id, variables),
-          []
-        )
-      ]
+  const id = `q${counter++}`
+  return ({ variables, render }) => (
+    { apollo: state },
+    { apollo: actions }
+  ) => {
+    const vnode = h(
+      render,
+      getRenderProps<Data, Variables>(state, actions, id, variables),
+      []
     )
+    const origOncreate = vnode.attributes && (vnode.attributes as any).oncreate
+    vnode.attributes = {
+      ...vnode.attributes,
+      key: id,
+      oncreate: (element: HTMLElement) => {
+        actions.init({ id, query, variables })
+        origOncreate && origOncreate(element)
+      }
+    } as any
+    return vnode
+  }
 }
 
 export default query

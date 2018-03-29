@@ -12,6 +12,7 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 
 ### Changed
 - Move hyperapp from peerDependencies to dependencies.
+- Remove `<apollo-query/>` element from DOM tree.
 
 ## [0.2.0] - 2018-03-29
 ### Changed
