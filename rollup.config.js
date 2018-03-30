@@ -23,6 +23,24 @@ export default [
     {
         input: "./src/index.ts",
         output: {
+            file: "./dist/index.mjs",
+            format: "es",
+            sourcemap: true,
+            external: [
+                "hyperapp"
+            ]
+        },
+        plugins: [
+            typescript({
+                compilerOptions: {
+                    declaration: true,
+                },
+            }),
+        ]
+    },
+    {
+        input: "./src/index.ts",
+        output: {
             file: "./dist/hyperapp-apollo.js",
             format: "iife",
             name: "HyperappApollo",
