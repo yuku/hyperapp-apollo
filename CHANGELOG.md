@@ -10,8 +10,11 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 ### Added
 - Add index.mjs to dist files.
 
+### Changed
+- Change format of dist/hyperapp-apollo.js from IIFE to UMD.
+
 ### Fixed
-- Enable to load apollo-utilities by IIFE script.
+- Enable to load apollo-utilities as global variable.
 
 ## [0.3.0] - 2018-03-30
 ### Added

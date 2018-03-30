@@ -42,7 +42,7 @@ export default [
         input: "./src/index.ts",
         output: {
             file: "./dist/hyperapp-apollo.js",
-            format: "iife",
+            format: "umd",
             name: "HyperappApollo",
             sourcemap: false,
             globals: {
@@ -65,7 +65,7 @@ export default [
         input: "./src/index.ts",
         output: {
             file: "./dist/hyperapp-apollo.min.js",
-            format: "iife",
+            format: "umd",
             name: "HyperappApollo",
             sourcemap: false,
             globals: {

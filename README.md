@@ -21,7 +21,7 @@ npm install --save hyperapp-apollo apollo-client apollo-cache-inmemory apollo-li
 ### Distribution files
 - **dist/index.js** - The CommonJS version of this package. (default)
 - **dist/index.mjs** - The ES Modules version of this package.
-- **dist/hyperapp-apollo.js**, **dist/hyperapp-apollo.min.js** - IIFE version of this package. This version exports itself to `window.HyperappApollo`.
+- **dist/hyperapp-apollo.js**, **dist/hyperapp-apollo.min.js** - The UMD version of this package. This version exports itself to `window.HyperappApollo`.
 
 ## Usage
 
