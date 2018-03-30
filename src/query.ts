@@ -7,6 +7,8 @@ import {
 } from "apollo-client"
 
 import * as apollo from "./apollo"
+import result from "./util/result"
+import omit from "./util/omit"
 import { QueryAttributes } from "./types"
 
 export interface QueryModuleState {
@@ -29,6 +31,7 @@ export interface Actions {
       client: ApolloClient<any>
     }
   ) => void
+  destroy: (data: { id: string }) => void
   refetch: (data: { id: string; variables?: any }) => void
   modules: {
     setData: (data: { id: string; data: Partial<QueryModuleState> }) => void
@@ -59,6 +62,9 @@ export const actions: ActionsType<State, Actions> = {
         .then(result => actions.modules.setData({ id, data: { result } }))
     }
   },
+  destroy: ({ id }) => state => ({
+    modules: omit(state.modules, id)
+  }),
   refetch: ({ id, variables }: { id: string; variables?: any }) => (
     { modules },
     actions
@@ -105,7 +111,7 @@ function getRenderProps<Data, Variables>(
   }
 }
 
-const query = <Data = {}, Variables = {}>(
+export default function query<Data = {}, Variables = {}>(
   query: any
 ): Component<
   {
@@ -115,7 +121,7 @@ const query = <Data = {}, Variables = {}>(
   },
   { apollo: apollo.State },
   { apollo: apollo.Actions }
-> => {
+> {
   const tmp = `q${counter++}`
   return ({ variables, render, key }) => (
     { apollo: state },
@@ -127,17 +133,20 @@ const query = <Data = {}, Variables = {}>(
       getRenderProps<Data, Variables>(state.query, actions.query, id)
     )
     const origOncreate = vnode.attributes && (vnode.attributes as any).oncreate
+    const origOndestory =
+      vnode.attributes && (vnode.attributes as any).ondestroy
     vnode.attributes = {
       ...vnode.attributes,
       key: id,
       oncreate: (element: HTMLElement) => {
         actions.initQuery({ id, query, variables })
-        // tslint:disable-next-line:no-unused-expression
-        origOncreate && origOncreate(element)
+        result(origOncreate, element)
+      },
+      ondestroy: (element: HTMLElement) => {
+        result(origOndestory, element)
+        actions.query.destroy({ id })
       }
     } as any
     return vnode
   }
 }
-
-export default query

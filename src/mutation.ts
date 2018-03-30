@@ -3,6 +3,8 @@ import { ApolloClient, ApolloError, MutationUpdaterFn } from "apollo-client"
 import { GraphQLError } from "graphql"
 
 import * as apollo from "./apollo"
+import result from "./util/result"
+import omit from "./util/omit"
 import { MutationAttributes } from "./types"
 
 export interface MutationModuleState<Data = {}> {
@@ -30,6 +32,7 @@ export interface Actions {
       update: MutationUpdaterFn<any> | undefined
     }
   ) => void
+  destroy: (data: { id: string }) => void
   mutate: (data: { id: string; variables?: any }) => void
   modules: {
     setData: (
@@ -63,6 +66,9 @@ export const actions: ActionsType<State, Actions> = {
     })
     return { client }
   },
+  destroy: ({ id }) => state => ({
+    modules: omit(state.modules, id)
+  }),
   mutate: ({ id, variables }: { id: string; variables?: any }) => (
     { client, modules },
     actions
@@ -129,7 +135,7 @@ function getRenderProps<Data, Variables>(
   }
 }
 
-const mutation = <Data = {}, Variables = {}>(
+export default function mutation<Data = {}, Variables = {}>(
   mutation: any
 ): Component<
   {
@@ -139,7 +145,7 @@ const mutation = <Data = {}, Variables = {}>(
   },
   { apollo: apollo.State },
   { apollo: apollo.Actions }
-> => {
+> {
   const tmp = `m${counter++}`
   return ({ render, key, update }) => (
     { apollo: state },
@@ -151,17 +157,19 @@ const mutation = <Data = {}, Variables = {}>(
       getRenderProps<Data, Variables>(state.mutation, actions.mutation, id)
     )
     const origOncreate = vnode.attributes && (vnode.attributes as any).oncraete
+    const origOndestroy =
+      vnode.attributes && (vnode.attributes as any).ondestroy
     vnode.attributes = {
       ...vnode.attributes,
       key: id,
       oncreate: (element: HTMLElement) => {
         actions.initMutation<Data>({ id, mutation, update })
-        // tslint:disable-next-line:no-unused-expression
-        origOncreate && origOncreate(element)
+        result(origOncreate, element)
+      },
+      ondestroy: (element: HTMLElement) => {
+        result(origOndestroy, element)
       }
     } as any
     return vnode
   }
 }
-
-export default mutation
