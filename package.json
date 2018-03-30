@@ -1,6 +1,6 @@
 {
   "name": "hyperapp-apollo",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "src/index.js",
