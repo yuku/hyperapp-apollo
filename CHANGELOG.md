@@ -18,6 +18,9 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 - Remove `<apollo-query/>` element from DOM tree.
 - `variables` render prop of specifies the variable object the query was called with.
 
+### Fixed
+- Make sure `loading` reflects query state.
+
 ## [0.2.0] - 2018-03-29
 ### Changed
 - Replace `graphql()` with `query()` for flexibility.

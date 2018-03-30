@@ -54,14 +54,12 @@ export const actions: ActionsType<State, Actions> = {
     query: any
     variables?: any
     client: ApolloClient<any>
-  }) => ({ modules }, actions) => {
-    if (!modules[id] || !modules[id].observable) {
-      const observable = client.watchQuery({ query, variables })
-      actions.modules.setData({ id, data: { observable } })
-      observable
-        .result()
-        .then(result => actions.modules.setData({ id, data: { result } }))
-    }
+  }) => (_, actions) => {
+    const observable = client.watchQuery({ query, variables })
+    actions.modules.setData({ id, data: { observable } })
+    observable
+      .result()
+      .then(result => actions.modules.setData({ id, data: { result } }))
   },
   destroy: ({ id }) => state => ({
     modules: omit(state.modules, id)
@@ -96,7 +94,7 @@ function getRenderProps<Data, Variables>(
         ? (currentResult.data as Data)
         : null,
     errors: currentResult && currentResult.errors,
-    loading: !!currentResult && currentResult.loading,
+    loading: currentResult ? currentResult.loading : true,
     refetch: () => actions.refetch({ id })
   }
 }
