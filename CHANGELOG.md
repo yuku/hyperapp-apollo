@@ -20,7 +20,7 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 - `variables` render prop of specifies the variable object the query was called with.
 
 ### Fixed
-- Make sure `loading` reflects query state.
+- Make sure `data` and `loading` reflects query state.
 
 ## [0.2.0] - 2018-03-29
 ### Changed

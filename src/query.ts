@@ -1,10 +1,5 @@
 import { h, Component, ActionsType } from "hyperapp"
-import {
-  ApolloCurrentResult,
-  ApolloQueryResult,
-  ObservableQuery,
-  ApolloClient
-} from "apollo-client"
+import { ApolloQueryResult, ObservableQuery, ApolloClient } from "apollo-client"
 import { isEqual } from "apollo-utilities"
 
 import * as apollo from "./apollo"
@@ -89,21 +84,18 @@ export const actions: ActionsType<State, Actions> = {
 let counter = 0
 
 function getRenderProps<Data, Variables>(
-  state: State,
+  state: QueryModuleState | undefined,
   actions: Actions,
   id: string
 ): QueryAttributes<Data, Variables> {
-  const observable = state.modules[id] && state.modules[id].observable
-  const currentResult: ApolloCurrentResult<Data> | null | undefined =
-    observable && observable.currentResult()
+  const observable = state && state.observable
+  const result = state && state.result
   return {
     variables: observable && (observable.variables as any),
     data:
-      currentResult && Object.keys(currentResult.data).length
-        ? (currentResult.data as Data)
-        : null,
-    errors: currentResult && currentResult.errors,
-    loading: currentResult ? currentResult.loading : true,
+      result && Object.keys(result.data).length ? (result.data as Data) : null,
+    errors: result && result.errors,
+    loading: result ? result.loading : true,
     refetch: () => actions.refetch({ id })
   }
 }
@@ -127,7 +119,11 @@ export default function query<Data = {}, Variables = {}>(
     const id = key ? `${tmp}[${key}]` : tmp
     const vnode = h(
       render,
-      getRenderProps<Data, Variables>(state.query, actions.query, id)
+      getRenderProps<Data, Variables>(
+        state.query.modules[id],
+        actions.query,
+        id
+      )
     )
     vnode.attributes = addLifeCycleHandlers(
       {
