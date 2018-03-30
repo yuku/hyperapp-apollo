@@ -11,6 +11,9 @@ import { QueryAttributes } from "./types"
 export interface QueryModuleState {
   result: ApolloQueryResult<any> | null
   observable: ObservableQuery<any> | null
+  subscription: {
+    unsubscribe: () => void
+  }
 }
 
 export interface State {
@@ -53,28 +56,26 @@ export const actions: ActionsType<State, Actions> = {
     client: ApolloClient<any>
   }) => (_, actions) => {
     const observable = client.watchQuery({ query, variables })
-    actions.modules.setData({ id, data: { observable } })
-    observable
-      .result()
-      .then(result => actions.modules.setData({ id, data: { result } }))
+    const subscription = observable.subscribe(result =>
+      actions.modules.setData({ id, data: { result } })
+    )
+    actions.modules.setData({ id, data: { observable, subscription } })
   },
-  update: ({ id, variables, oldVariables }) => ({ modules }, actions) => {
+  update: ({ id, variables, oldVariables }) => ({ modules }) => {
     if (!isEqual(variables, oldVariables)) {
-      modules[id]
-        .observable!.setVariables(variables)
-        .then(result => actions.modules.setData({ id, data: { result } }))
+      modules[id].observable!.setVariables(variables)
     }
   },
-  destroy: ({ id }) => state => ({
-    modules: omit(state.modules, id)
-  }),
-  refetch: ({ id, variables }: { id: string; variables?: any }) => (
-    { modules },
-    actions
-  ) => {
-    modules[id]
-      .observable!.refetch(variables)
-      .then(result => actions.modules.setData({ id, data: { result } }))
+  destroy: ({ id }) => ({ modules }) => {
+    modules[id].subscription.unsubscribe()
+    return {
+      modules: omit(modules, id)
+    }
+  },
+  refetch: ({ id, variables }: { id: string; variables?: any }) => ({
+    modules
+  }) => {
+    modules[id].observable!.refetch(variables)
   },
   modules: {
     setData
