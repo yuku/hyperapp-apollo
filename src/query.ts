@@ -7,7 +7,8 @@ import {
 } from "apollo-client"
 
 import * as apollo from "./apollo"
-import result from "./util/result"
+import addLifeCycleHandlers from "./util/addLifeCycleHandlers"
+import setData from "./util/setData"
 import omit from "./util/omit"
 import { QueryAttributes } from "./types"
 
@@ -74,18 +75,7 @@ export const actions: ActionsType<State, Actions> = {
       .then(result => actions.modules.setData({ id, data: { result } }))
   },
   modules: {
-    setData: ({
-      id,
-      data
-    }: {
-      id: string
-      data: Partial<QueryModuleState>
-    }) => state => ({
-      [id]: {
-        ...state[id],
-        ...data
-      }
-    })
+    setData
   }
 }
 
@@ -132,21 +122,16 @@ export default function query<Data = {}, Variables = {}>(
       render,
       getRenderProps<Data, Variables>(state.query, actions.query, id)
     )
-    const origOncreate = vnode.attributes && (vnode.attributes as any).oncreate
-    const origOndestory =
-      vnode.attributes && (vnode.attributes as any).ondestroy
-    vnode.attributes = {
-      ...vnode.attributes,
-      key: id,
-      oncreate: (element: HTMLElement) => {
-        actions.initQuery({ id, query, variables })
-        result(origOncreate, element)
+    vnode.attributes = addLifeCycleHandlers(
+      {
+        ...vnode.attributes,
+        key: id
       },
-      ondestroy: (element: HTMLElement) => {
-        result(origOndestory, element)
-        actions.query.destroy({ id })
+      {
+        oncreate: () => actions.initQuery({ id, query, variables }),
+        ondestroy: () => actions.query.destroy({ id })
       }
-    } as any
+    )
     return vnode
   }
 }

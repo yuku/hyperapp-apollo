@@ -3,8 +3,9 @@ import { ApolloClient, ApolloError, MutationUpdaterFn } from "apollo-client"
 import { GraphQLError } from "graphql"
 
 import * as apollo from "./apollo"
-import result from "./util/result"
 import omit from "./util/omit"
+import setData from "./util/setData"
+import addLifeCycleHandlers from "./util/addLifeCycleHandlers"
 import { MutationAttributes } from "./types"
 
 export interface MutationModuleState<Data = {}> {
@@ -108,12 +109,7 @@ export const actions: ActionsType<State, Actions> = {
       })
   },
   modules: {
-    setData: ({ id, data }: { id: string; data: any }) => state => ({
-      [id]: {
-        ...state[id],
-        ...data
-      }
-    })
+    setData
   }
 }
 
@@ -156,20 +152,16 @@ export default function mutation<Data = {}, Variables = {}>(
       render,
       getRenderProps<Data, Variables>(state.mutation, actions.mutation, id)
     )
-    const origOncreate = vnode.attributes && (vnode.attributes as any).oncraete
-    const origOndestroy =
-      vnode.attributes && (vnode.attributes as any).ondestroy
-    vnode.attributes = {
-      ...vnode.attributes,
-      key: id,
-      oncreate: (element: HTMLElement) => {
-        actions.initMutation<Data>({ id, mutation, update })
-        result(origOncreate, element)
+    vnode.attributes = addLifeCycleHandlers(
+      {
+        ...vnode.attributes,
+        key: id
       },
-      ondestroy: (element: HTMLElement) => {
-        result(origOndestroy, element)
+      {
+        oncreate: () => actions.initMutation<Data>({ id, mutation, update }),
+        ondestroy: () => actions.mutation.destroy({ id })
       }
-    } as any
+    )
     return vnode
   }
 }
