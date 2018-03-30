@@ -11,6 +11,7 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 - Add hyperapp-apollo.js and hyperapp-apollo.min.js to dist files.
 - Enable to use `<Query/>` in a loop.
 - Add `mutation()` and `<Mutation/>` component.
+- Export `QueryModuleState` and `MutationModuleState` types.
 
 ### Changed
 - Move hyperapp from peerDependencies to dependencies.
