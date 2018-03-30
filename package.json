@@ -23,6 +23,7 @@
     "lint:tslint": "tslint --project ."
   },
   "dependencies": {
+    "apollo-utilities": "^1.0.11",
     "hyperapp": "^1.2.5"
   },
   "devDependencies": {

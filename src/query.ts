@@ -5,6 +5,7 @@ import {
   ObservableQuery,
   ApolloClient
 } from "apollo-client"
+import { isEqual } from "apollo-utilities"
 
 import * as apollo from "./apollo"
 import addLifeCycleHandlers from "./util/addLifeCycleHandlers"
@@ -32,6 +33,7 @@ export interface Actions {
       client: ApolloClient<any>
     }
   ) => void
+  update: (data: { id: string; variables: any; oldVariables: any }) => void
   destroy: (data: { id: string }) => void
   refetch: (data: { id: string; variables?: any }) => void
   modules: {
@@ -60,6 +62,13 @@ export const actions: ActionsType<State, Actions> = {
     observable
       .result()
       .then(result => actions.modules.setData({ id, data: { result } }))
+  },
+  update: ({ id, variables, oldVariables }) => ({ modules }, actions) => {
+    if (!isEqual(variables, oldVariables)) {
+      modules[id]
+        .observable!.setVariables(variables)
+        .then(result => actions.modules.setData({ id, data: { result } }))
+    }
   },
   destroy: ({ id }) => state => ({
     modules: omit(state.modules, id)
@@ -127,6 +136,8 @@ export default function query<Data = {}, Variables = {}>(
       },
       {
         oncreate: () => actions.initQuery({ id, query, variables }),
+        onupdate: (_, old) =>
+          actions.query.update({ id, variables, oldVariables: old.variables }),
         ondestroy: () => actions.query.destroy({ id })
       }
     )

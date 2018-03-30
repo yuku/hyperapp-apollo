@@ -12,6 +12,7 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 - Enable to use `<Query/>` in a loop.
 - Add `mutation()` and `<Mutation/>` component.
 - Export `QueryModuleState` and `MutationModuleState` types.
+- `<Query/>` is reactive for changing `variables` prop.
 
 ### Changed
 - Move hyperapp from peerDependencies to dependencies.
