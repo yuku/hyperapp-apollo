@@ -10,6 +10,9 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 ### Added
 - Add index.mjs to dist files.
 
+### Fixed
+- Enable to load apollo-utilities by IIFE script.
+
 ## [0.3.0] - 2018-03-30
 ### Added
 - Add hyperapp-apollo.js and hyperapp-apollo.min.js to dist files.

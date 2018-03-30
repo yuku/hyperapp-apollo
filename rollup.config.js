@@ -46,10 +46,11 @@ export default [
             name: "HyperappApollo",
             sourcemap: false,
             globals: {
-                hyperapp: "hyperapp"
+                "apollo-utilities": "apollo.utilities"
             },
             external: [
-                "hyperapp"
+                "hyperapp",
+                "apollo-utilities"
             ]
         },
         plugins: [
@@ -68,10 +69,11 @@ export default [
             name: "HyperappApollo",
             sourcemap: false,
             globals: {
-                hyperapp: "hyperapp"
+                "apollo-utilities": "apollo.utilities"
             },
             external: [
-                "hyperapp"
+                "hyperapp",
+                "apollo-utilities"
             ]
         },
         plugins: [
