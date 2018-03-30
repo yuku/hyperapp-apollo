@@ -101,6 +101,17 @@ function getRenderProps<Data, Variables>(
   }
 }
 
+function renderComponent<Data, Variables>(state: State, actions: Actions, id: string, render: Component<any, any, any>) {
+  return h(
+    render,
+    getRenderProps<Data, Variables>(
+      state.modules[id],
+      actions,
+      id
+    )
+  )
+}
+
 export default function query<Data = {}, Variables = {}>(
   query: any
 ): Component<
@@ -118,14 +129,7 @@ export default function query<Data = {}, Variables = {}>(
     { apollo: actions }
   ) => {
     const id = key ? `${tmp}[${key}]` : tmp
-    const vnode = h(
-      render,
-      getRenderProps<Data, Variables>(
-        state.query.modules[id],
-        actions.query,
-        id
-      )
-    )
+    const vnode = renderComponent<Data, Variables>(state.query, actions.query, id, render)
     vnode.attributes = addLifeCycleHandlers(
       {
         ...vnode.attributes,
