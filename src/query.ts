@@ -31,7 +31,7 @@ export interface Actions {
       client: ApolloClient<any>
     }
   ) => void
-  update: (data: { id: string; variables: any; oldVariables: any }) => void
+  update: (data: { id: string; variables: any }) => void
   destroy: (data: { id: string }) => void
   refetch: (data: { id: string; variables?: any }) => void
   modules: {
@@ -61,10 +61,10 @@ export const actions: ActionsType<State, Actions> = {
     )
     actions.modules.setData({ id, data: { observable, subscription } })
   },
-  update: ({ id, variables, oldVariables }) => ({ modules }) => {
-    if (!isEqual(variables, oldVariables)) {
-      modules[id].observable!.setVariables(variables)
-    }
+  update: ({ id, variables }) => ({ modules }, actions) => {
+    modules[id]
+      .observable!.setVariables(variables)
+      .then(result => actions.modules.setData({ id, data: { result } }))
   },
   destroy: ({ id }) => ({ modules }) => {
     modules[id].subscription.unsubscribe()
@@ -101,14 +101,15 @@ function getRenderProps<Data, Variables>(
   }
 }
 
-function renderComponent<Data, Variables>(state: State, actions: Actions, id: string, render: Component<any, any, any>) {
+function renderComponent<Data, Variables>(
+  state: State,
+  actions: Actions,
+  id: string,
+  render: Component<any, any, any>
+) {
   return h(
     render,
-    getRenderProps<Data, Variables>(
-      state.modules[id],
-      actions,
-      id
-    )
+    getRenderProps<Data, Variables>(state.modules[id], actions, id)
   )
 }
 
@@ -129,7 +130,12 @@ export default function query<Data = {}, Variables = {}>(
     { apollo: actions }
   ) => {
     const id = key ? `${tmp}[${key}]` : tmp
-    const vnode = renderComponent<Data, Variables>(state.query, actions.query, id, render)
+    const vnode = renderComponent<Data, Variables>(
+      state.query,
+      actions.query,
+      id,
+      render
+    )
     vnode.attributes = addLifeCycleHandlers(
       {
         ...vnode.attributes,
@@ -137,8 +143,11 @@ export default function query<Data = {}, Variables = {}>(
       },
       {
         oncreate: () => actions.initQuery({ id, query, variables }),
-        onupdate: (_, old) =>
-          actions.query.update({ id, variables, oldVariables: old.variables }),
+        onupdate: (_, old) => {
+          if (!isEqual(variables, old.variables)) {
+            actions.query.update({ id, variables })
+          }
+        },
         ondestroy: () => actions.query.destroy({ id })
       }
     )

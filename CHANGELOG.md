@@ -10,6 +10,9 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 ### Changed
 - Remove src directory from npm package.
 
+### Fixed
+- Update query result when `variables` prop is changed.
+
 ## [0.3.1] - 2018-03-30
 ### Added
 - Add index.mjs to dist files.
