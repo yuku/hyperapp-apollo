@@ -1,5 +1,6 @@
 {
   "name": "hyperapp-apollo",
+  "description": "Apollo/GraphQL integration for Hyperapp",
   "version": "0.3.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -15,11 +16,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "(rm -fr dist || true) && rollup -c",
-    "format": "prettier --no-semi --parser typescript --write src/*.ts",
+    "build:dist": "(rm -fr dist || true) && rollup -c",
+    "build:docs": "(rm -fr docs || true) && parcel build src/docs/index.html -d docs --public-url /hyperapp-apollo",
+    "build": "run-p build:*",
+    "format": "prettier --no-semi --parser typescript --write 'src/**/*.ts' --write 'src/**/*.tsx'",
+    "lint:prettier": "prettier --no-semi --parser typescript -l 'src/**/*.ts' --write 'src/**/*.tsx'",
+    "lint:tslint": "tslint --project .",
     "lint": "run-p lint:*",
-    "lint:prettier": "prettier --no-semi --parser typescript -l src/*.ts",
-    "lint:tslint": "tslint --project ."
+    "start": "parcel src/docs/index.html"
   },
   "dependencies": {
     "apollo-utilities": "^1.0.11",
@@ -27,9 +31,16 @@
   },
   "devDependencies": {
     "@types/graphql": "^0.12.7",
+    "apollo-boost": "^0.1.4",
     "apollo-client": "^2.2.8",
+    "bulma": "^0.6.2",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.8.0",
     "hyperapp": "^1.2.5",
+    "hyperapp-hash-router": "^0.1.0",
+    "node-sass": "^4.8.3",
     "npm-run-all": "^4.1.2",
+    "parcel-bundler": "^1.7.0",
     "prettier": "^1.11.1",
     "rollup": "^0.57.1",
     "rollup-plugin-typescript2": "^0.12.0",

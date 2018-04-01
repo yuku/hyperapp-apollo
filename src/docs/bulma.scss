@@ -1,0 +1,9 @@
+@import "../../node_modules/bulma/sass/utilities/initial-variables";
+@import "../../node_modules/bulma/sass/utilities/functions";
+
+@import "../../node_modules/bulma/bulma";
+
+.navbar-brand {
+  font-family: 'Coda Caption', sans-serif;
+  font-size: 1.5em;
+}
