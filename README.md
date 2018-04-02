@@ -6,6 +6,10 @@
 Hyperapp Apollo allows you to fetch data from your GraphQL server and use it in building complex
 and reactive UIs using the Hyperapp framework.
 
+## Demo
+
+- [Pokedex](https://yuku-t.com/hyperapp-apollo/examples/pokedex/index.html) - [Source code](https://github.com/yuku-t/hyperapp-apollo/tree/master/src/docs/examples/pokedex)
+
 ## Installation
 
 If your project is using npm, you can install [hyperapp-apollo](https://www.npmjs.com/package/hyperapp-apollo) package by npm command:
