@@ -11,7 +11,14 @@ export interface State {
 }
 
 export interface Actions {
-  initQuery: (data: { id: string; query: any; variables?: any }) => void
+  initQuery: (
+    data: {
+      id: string
+      query: any
+      variables?: any
+      notifyOnNetworkStatusChange?: boolean
+    }
+  ) => void
   initMutation: <Data>(
     data: {
       id: string
@@ -39,13 +46,21 @@ export const actions: ActionsType<State, Actions> = {
   initQuery: ({
     id,
     query,
-    variables
+    variables,
+    notifyOnNetworkStatusChange
   }: {
     id: string
     query: any
     variables?: any
+    notifyOnNetworkStatusChange?: boolean
   }) => ({ client }, actions) => {
-    actions.query.init({ id, query, variables, client: getClient(client) })
+    actions.query.init({
+      id,
+      query,
+      variables,
+      client: getClient(client),
+      notifyOnNetworkStatusChange
+    })
   },
   initMutation: ({
     id,

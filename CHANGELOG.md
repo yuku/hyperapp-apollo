@@ -7,6 +7,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 
 ## [Unreleased]
+### Added
+- Support `fetchMore` and `notificyNetworkStatusChange`
+
 ### Changed
 - Remove src directory from npm package.
 

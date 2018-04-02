@@ -1,5 +1,11 @@
 import { h, Component, ActionsType } from "hyperapp"
-import { ApolloQueryResult, ObservableQuery, ApolloClient } from "apollo-client"
+import {
+  ApolloQueryResult,
+  ObservableQuery,
+  ApolloClient,
+  FetchMoreOptions,
+  FetchMoreQueryOptions
+} from "apollo-client"
 import { isEqual } from "apollo-utilities"
 
 import * as apollo from "./apollo"
@@ -29,11 +35,11 @@ export interface Actions {
       query: any
       variables?: any
       client: ApolloClient<any>
+      notifyOnNetworkStatusChange?: boolean
     }
   ) => void
   update: (data: { id: string; variables: any }) => void
   destroy: (data: { id: string }) => void
-  refetch: (data: { id: string; variables?: any }) => void
   modules: {
     setData: (data: { id: string; data: Partial<QueryModuleState> }) => void
   }
@@ -48,14 +54,20 @@ export const actions: ActionsType<State, Actions> = {
     id,
     query,
     variables,
-    client
+    client,
+    notifyOnNetworkStatusChange
   }: {
     id: string
     query: any
     variables?: any
     client: ApolloClient<any>
+    notifyOnNetworkStatusChange?: boolean
   }) => (_, actions) => {
-    const observable = client.watchQuery({ query, variables })
+    const observable = client.watchQuery({
+      query,
+      variables,
+      notifyOnNetworkStatusChange
+    })
     const subscription = observable.subscribe(result =>
       actions.modules.setData({ id, data: { result } })
     )
@@ -72,11 +84,6 @@ export const actions: ActionsType<State, Actions> = {
       modules: omit(modules, id)
     }
   },
-  refetch: ({ id, variables }: { id: string; variables?: any }) => ({
-    modules
-  }) => {
-    modules[id].observable!.refetch(variables)
-  },
   modules: {
     setData
   }
@@ -85,9 +92,7 @@ export const actions: ActionsType<State, Actions> = {
 let counter = 0
 
 function getRenderProps<Data, Variables>(
-  state: QueryModuleState | undefined,
-  actions: Actions,
-  id: string
+  state: QueryModuleState | undefined
 ): QueryAttributes<Data, Variables> {
   const observable = state && state.observable
   const result = state && state.result
@@ -97,20 +102,18 @@ function getRenderProps<Data, Variables>(
       result && Object.keys(result.data).length ? (result.data as Data) : null,
     errors: result && result.errors,
     loading: result ? result.loading : true,
-    refetch: () => actions.refetch({ id })
+    refetch: () => observable && observable.refetch(),
+    fetchMore: (option: FetchMoreOptions & FetchMoreQueryOptions) =>
+      observable && observable.fetchMore(option)
   }
 }
 
 function renderComponent<Data, Variables>(
   state: State,
-  actions: Actions,
   id: string,
   render: Component<any, any, any>
 ) {
-  return h(
-    render,
-    getRenderProps<Data, Variables>(state.modules[id], actions, id)
-  )
+  return h(render, getRenderProps<Data, Variables>(state.modules[id]))
 }
 
 export default function query<Data = {}, Variables = {}>(
@@ -119,30 +122,32 @@ export default function query<Data = {}, Variables = {}>(
   {
     key?: string
     variables?: Variables
+    notifyOnNetworkStatusChange?: boolean
     render: Component<QueryAttributes<Data, Variables>, any, any>
   },
   { apollo: apollo.State },
   { apollo: apollo.Actions }
 > {
   const tmp = `q${counter++}`
-  return ({ variables, render, key }) => (
+  return ({ variables, render, key, notifyOnNetworkStatusChange }) => (
     { apollo: state },
     { apollo: actions }
   ) => {
     const id = key ? `${tmp}[${key}]` : tmp
-    const vnode = renderComponent<Data, Variables>(
-      state.query,
-      actions.query,
-      id,
-      render
-    )
+    const vnode = renderComponent<Data, Variables>(state.query, id, render)
     vnode.attributes = addLifeCycleHandlers(
       {
         ...vnode.attributes,
         key: id
       },
       {
-        oncreate: () => actions.initQuery({ id, query, variables }),
+        oncreate: () =>
+          actions.initQuery({
+            id,
+            query,
+            variables,
+            notifyOnNetworkStatusChange
+          }),
         onupdate: (_, old) => {
           if (!isEqual(variables, old.variables)) {
             actions.query.update({ id, variables })
