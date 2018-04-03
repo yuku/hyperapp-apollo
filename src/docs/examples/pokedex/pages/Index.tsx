@@ -34,25 +34,53 @@ const Query = query<{
 export default () => (
   <ApplicationLayout>
     <Query
-      render={({ data, loading }) => (
+      render={({ data, loading, fetchMore }) => (
         <div key="index">
-          {loading ? (
-            <div class="element loading" />
-          ) : (
-            <div class="columns is-mobile is-multiline">
-              {data.pokemons.map(pokemon => (
+          <div class="columns is-mobile is-multiline">
+            {data &&
+              data.pokemons.map(pokemon => (
                 <div class="column is-half-mobile is-one-third-tablet is-one-quarter-desktop is-one-fifth-widescreen">
                   <Link to={`/pokemon/${pokemon.name}`}>
                     <Card {...pokemon} />
                   </Link>
                 </div>
               ))}
-            </div>
+          </div>
+          {loading ? (
+            <div class="element loading" />
+          ) : (
+            data.pokemons.length < 151 && (
+              <button
+                onclick={() => {
+                  fetchMore({
+                    variables: {
+                      first: data.pokemons.length + 20
+                    },
+                    updateQuery: (prev, { fetchMoreResult }) => {
+                      if (!fetchMoreResult) {
+                        return prev
+                      }
+                      return {
+                        ...prev,
+                        pokemons: [
+                          ...prev.pokemons,
+                          ...fetchMoreResult.pokemons.slice(
+                            prev.pokemons.length
+                          )
+                        ]
+                      }
+                    }
+                  })
+                }}
+              >
+                Fetch More
+              </button>
+            )
           )}
         </div>
       )}
-      // TODO: Pagination
-      variables={{ first: 151 }}
+      variables={{ first: 20 }}
+      notifyOnNetworkStatusChange={true}
     />
   </ApplicationLayout>
 )
