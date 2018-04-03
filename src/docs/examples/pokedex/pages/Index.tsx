@@ -50,31 +50,39 @@ export default () => (
             <div class="element loading" />
           ) : (
             data.pokemons.length < 151 && (
-              <button
-                onclick={() => {
-                  fetchMore({
-                    variables: {
-                      first: data.pokemons.length + 20
-                    },
-                    updateQuery: (prev, { fetchMoreResult }) => {
-                      if (!fetchMoreResult) {
-                        return prev
-                      }
-                      return {
-                        ...prev,
-                        pokemons: [
-                          ...prev.pokemons,
-                          ...fetchMoreResult.pokemons.slice(
-                            prev.pokemons.length
-                          )
-                        ]
-                      }
+              <div
+                key={data.pokemons.length}
+                class="element loading"
+                oncreate={e => {
+                  e.onscroll = () => {
+                    if (e.getBoundingClientRect().top <= document.documentElement.clientHeight) {
+                      fetchMore({
+                        variables: {
+                          first: data.pokemons.length + 20
+                        },
+                        updateQuery: (prev, { fetchMoreResult }) => {
+                          if (!fetchMoreResult) {
+                            return prev
+                          }
+                          return {
+                            ...prev,
+                            pokemons: [
+                              ...prev.pokemons,
+                              ...fetchMoreResult.pokemons.slice(
+                                prev.pokemons.length
+                              )
+                            ]
+                          }
+                        }
+                      })
                     }
-                  })
+                  }
+                  addEventListener("scroll", e.onscroll)
                 }}
-              >
-                Fetch More
-              </button>
+                ondestroy={e => {
+                  removeEventListener("scroll", e.onscroll)
+                }}
+              />
             )
           )}
         </div>
