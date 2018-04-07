@@ -19,8 +19,8 @@
     "build:dist": "(rm -fr dist || true) && rollup -c",
     "build:docs": "(rm -fr docs || true) && parcel build src/docs/index.html -d docs --public-url /hyperapp-apollo",
     "build": "run-p build:*",
-    "format": "prettier --no-semi --parser typescript --write 'src/**/*.ts' --write 'src/**/*.tsx'",
-    "lint:prettier": "prettier --no-semi --parser typescript -l 'src/**/*.ts' --write 'src/**/*.tsx'",
+    "format": "prettier --parser typescript --write 'src/**/*.ts' --write 'src/**/*.tsx'",
+    "lint:prettier": "prettier --parser typescript -l 'src/**/*.ts' --write 'src/**/*.tsx'",
     "lint:tslint": "tslint --project .",
     "lint": "run-p lint:*",
     "start": "parcel src/docs/index.html"
@@ -53,5 +53,9 @@
     "apollo-client": "^2.2.8",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.8.0"
+  },
+  "prettier": {
+    "printWidth": 120,
+    "semi": false
   }
 }

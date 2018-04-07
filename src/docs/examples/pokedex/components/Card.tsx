@@ -1,11 +1,6 @@
 import { h, Component } from "hyperapp"
 
-export default (props: {
-  number: string
-  name: string
-  image: string
-  classification
-}) => (
+export default (props: { number: string; name: string; image: string; classification }) => (
   <div class="card">
     <div class="card-image">
       <figure

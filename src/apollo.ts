@@ -42,15 +42,10 @@ export const actions: ActionsType<State, Actions> = {
       client: getClient(client)
     })
   },
-  initMutation: ({
-    id,
-    mutation,
-    update
-  }: {
-    id: string
-    mutation: any
-    update: MutationUpdaterFn | undefined
-  }) => ({ client }, actions) => {
+  initMutation: ({ id, mutation, update }: { id: string; mutation: any; update: MutationUpdaterFn | undefined }) => (
+    { client },
+    actions
+  ) => {
     actions.mutation.init({ id, mutation, client: getClient(client), update })
   },
   query: query.actions,

@@ -36,9 +36,7 @@ export interface Actions {
   destroy: (data: { id: string }) => void
   mutate: (data: { id: string; variables?: any }) => void
   modules: {
-    setData: (
-      data: { id: string; data: Partial<MutationModuleState<any>> }
-    ) => void
+    setData: (data: { id: string; data: Partial<MutationModuleState<any>> }) => void
   }
 }
 
@@ -70,10 +68,7 @@ export const actions: ActionsType<State, Actions> = {
   destroy: ({ id }) => state => ({
     modules: omit(state.modules, id)
   }),
-  mutate: ({ id, variables }: { id: string; variables?: any }) => (
-    { client, modules },
-    actions
-  ) => {
+  mutate: ({ id, variables }: { id: string; variables?: any }) => ({ client, modules }, actions) => {
     actions.modules.setData({
       id,
       data: {
@@ -126,8 +121,7 @@ function getRenderProps<Data, Variables>(
     errors: mod && mod.errors,
     called: mod && mod.called,
     loading: mod && mod.loading,
-    execute: ({ variables }: { variables?: Variables }) =>
-      actions.mutate({ id, variables })
+    execute: ({ variables }: { variables?: Variables }) => actions.mutate({ id, variables })
   }
 }
 
@@ -143,15 +137,9 @@ export default function mutation<Data = {}, Variables = {}>(
   { apollo: apollo.Actions }
 > {
   const tmp = `m${counter++}`
-  return ({ render, key, update }) => (
-    { apollo: state },
-    { apollo: actions }
-  ) => {
+  return ({ render, key, update }) => ({ apollo: state }, { apollo: actions }) => {
     const id = key ? `${tmp}[${key}]` : tmp
-    const vnode = h(
-      render,
-      getRenderProps<Data, Variables>(state.mutation, actions.mutation, id)
-    )
+    const vnode = h(render, getRenderProps<Data, Variables>(state.mutation, actions.mutation, id))
     vnode.attributes = addLifeCycleHandlers(
       {
         ...vnode.attributes,

@@ -5,7 +5,5 @@ export default function resolveNode<State, Actions>(
   state: State,
   actions: Actions
 ): VNode<any> {
-  return typeof node === "function"
-    ? resolveNode(node(state, actions), state, actions)
-    : node
+  return typeof node === "function" ? resolveNode(node(state, actions), state, actions) : node
 }

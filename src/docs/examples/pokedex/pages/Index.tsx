@@ -55,10 +55,7 @@ export default () => (
                 class="element loading"
                 oncreate={e => {
                   e.onscroll = () => {
-                    if (
-                      e.getBoundingClientRect().top <=
-                      document.documentElement.clientHeight
-                    ) {
+                    if (e.getBoundingClientRect().top <= document.documentElement.clientHeight) {
                       fetchMore({
                         variables: {
                           first: data.pokemons.length + 20
@@ -69,12 +66,7 @@ export default () => (
                           }
                           return {
                             ...prev,
-                            pokemons: [
-                              ...prev.pokemons,
-                              ...fetchMoreResult.pokemons.slice(
-                                prev.pokemons.length
-                              )
-                            ]
+                            pokemons: [...prev.pokemons, ...fetchMoreResult.pokemons.slice(prev.pokemons.length)]
                           }
                         }
                       })
