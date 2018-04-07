@@ -2,7 +2,7 @@ import { h, Component } from "hyperapp"
 import gql from "graphql-tag"
 import { Link } from "hyperapp-hash-router"
 
-import { query } from "../../../../../src"
+import { Query, QueryRenderProps } from "../../../../../src"
 
 import ApplicationLayout from "../layout/Application"
 import Card from "../components/Card"
@@ -27,18 +27,16 @@ const GET_POKEMONS = gql`
   }
 `
 
-const Query = query<{
-  pokemons: Pokemon[]
-}>(GET_POKEMONS)
-
 export default () => (
   <ApplicationLayout>
     <Query
-      render={({ data, loading, fetchMore }) => (
+      key="index"
+      query={GET_POKEMONS}
+      render={(params: QueryRenderProps<{ pokemons: Pokemon[] }>) => (
         <div key="index">
           <div class="columns is-mobile is-multiline">
-            {data &&
-              data.pokemons.map(pokemon => (
+            {params.data.pokemons &&
+              params.data.pokemons.map(pokemon => (
                 <div class="column is-half-mobile is-one-third-tablet is-one-quarter-desktop is-one-fifth-widescreen">
                   <Link to={`/pokemon/${pokemon.name}`}>
                     <Card {...pokemon} />
@@ -46,19 +44,19 @@ export default () => (
                 </div>
               ))}
           </div>
-          {loading ? (
+          {params.loading ? (
             <div class="element loading" />
           ) : (
-            data.pokemons.length < 151 && (
+            params.data.pokemons.length < 151 && (
               <div
-                key={data.pokemons.length}
+                key={params.data.pokemons.length}
                 class="element loading"
                 oncreate={e => {
                   e.onscroll = () => {
                     if (e.getBoundingClientRect().top <= document.documentElement.clientHeight) {
-                      fetchMore({
+                      params.fetchMore({
                         variables: {
-                          first: data.pokemons.length + 20
+                          first: params.data.pokemons.length + 20
                         },
                         updateQuery: (prev, { fetchMoreResult }) => {
                           if (!fetchMoreResult) {

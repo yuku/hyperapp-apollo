@@ -2,7 +2,7 @@ import { h, Component } from "hyperapp"
 import gql from "graphql-tag"
 import { Link } from "hyperapp-hash-router"
 
-import { query } from "../../../../../src"
+import { Query, QueryRenderProps } from "../../../../../src"
 
 import ApplicationLayout from "../layout/Application"
 import Card from "../components/Card"
@@ -84,16 +84,14 @@ const GET_POKEMON = gql`
   }
 `
 
-const Query = query<{
-  pokemon: Pokemon
-}>(GET_POKEMON)
-
 export default ({ match }) => (
   <ApplicationLayout>
     <Query
-      render={({ data, loading }) => (
+      key="entry"
+      query={GET_POKEMON}
+      render={(params: QueryRenderProps<{ pokemon: Pokemon }>) => (
         <div key="entry">
-          {loading ? (
+          {params.loading ? (
             <div class="element loading" />
           ) : (
             <div class="columns is-centered">
@@ -104,21 +102,21 @@ export default ({ match }) => (
                       <Link to="/">Index</Link>
                     </li>
                     <li class="is-active">
-                      <Link to={match.url}>{data.pokemon.name}</Link>
+                      <Link to={match.url}>{params.data.pokemon.name}</Link>
                     </li>
                   </ul>
                 </nav>
                 <div class="columns">
                   <div class="column">
-                    <Card {...data.pokemon} />
+                    <Card {...params.data.pokemon} />
                   </div>
                   <div class="column">
                     <h4 class="subtitle is-4">Types</h4>
-                    <div class="tags">{data.pokemon.types.map(type => <span class="tag">{type}</span>)}</div>
+                    <div class="tags">{params.data.pokemon.types.map(type => <span class="tag">{type}</span>)}</div>
                     <h4 class="subtitle is-4">Weaknesses</h4>
-                    <div class="tags">{data.pokemon.weaknesses.map(type => <span class="tag">{type}</span>)}</div>
+                    <div class="tags">{params.data.pokemon.weaknesses.map(type => <span class="tag">{type}</span>)}</div>
                     <h4 class="subtitle is-4">Resistant</h4>
-                    <div class="tags">{data.pokemon.resistant.map(type => <span class="tag">{type}</span>)}</div>
+                    <div class="tags">{params.data.pokemon.resistant.map(type => <span class="tag">{type}</span>)}</div>
                   </div>
                 </div>
                 <div>
@@ -132,14 +130,14 @@ export default ({ match }) => (
                       </tr>
                     </thead>
                     <tbody>
-                      {data.pokemon.attacks.fast.map(attack => (
+                      {params.data.pokemon.attacks.fast.map(attack => (
                         <tr>
                           <td>{attack.name}</td>
                           <td>{attack.type}</td>
                           <td>{attack.damage}</td>
                         </tr>
                       ))}
-                      {data.pokemon.attacks.special.map(attack => (
+                      {params.data.pokemon.attacks.special.map(attack => (
                         <tr>
                           <td>{attack.name}</td>
                           <td>{attack.type}</td>
@@ -152,8 +150,8 @@ export default ({ match }) => (
 
                 <div>
                   <h4 class="title is-4">Evolutions</h4>
-                  {data.pokemon.evolutions ? (
-                    data.pokemon.evolutions.map(pokemon => (
+                  {params.data.pokemon.evolutions ? (
+                    params.data.pokemon.evolutions.map(pokemon => (
                       <Link to={`/pokemon/${pokemon.name}`} class="media">
                         <figure
                           class="media-left"
