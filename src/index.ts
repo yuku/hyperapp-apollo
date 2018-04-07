@@ -1,5 +1,4 @@
 import * as apollo from "./apollo"
 export { apollo }
-export * from "./Query"
-export { default as mutation } from "./mutation"
-export * from "./types"
+export { Query, QueryProps, QueryResult as QueryRenderProps } from "./Query"
+export { Mutation, MutationProps, RenderProps as MutationRenderProps } from "./Mutation"

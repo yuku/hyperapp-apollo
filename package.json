@@ -26,7 +26,8 @@
     "start": "parcel src/docs/index.html"
   },
   "dependencies": {
-    "apollo-utilities": "^1.0.11",
+    "apollo-cache": "^1.1.7",
+    "apollo-link": "^1.2.1",
     "hyperapp": "^1.2.5"
   },
   "devDependencies": {

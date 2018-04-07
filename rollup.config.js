@@ -45,12 +45,8 @@ export default [
             format: "umd",
             name: "HyperappApollo",
             sourcemap: false,
-            globals: {
-                "apollo-utilities": "apollo.utilities"
-            },
             external: [
                 "hyperapp",
-                "apollo-utilities"
             ]
         },
         plugins: [
@@ -68,12 +64,8 @@ export default [
             format: "umd",
             name: "HyperappApollo",
             sourcemap: false,
-            globals: {
-                "apollo-utilities": "apollo.utilities"
-            },
             external: [
                 "hyperapp",
-                "apollo-utilities"
             ]
         },
         plugins: [

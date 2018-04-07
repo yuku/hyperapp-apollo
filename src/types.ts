@@ -1,16 +1,11 @@
-import { GraphQLError } from "graphql"
-import { FetchMoreOptions, FetchMoreQueryOptions } from "apollo-client"
+import { FetchMoreOptions, FetchMoreQueryOptions, PureQueryOptions } from "apollo-client"
+import { DataProxy } from "apollo-cache"
+import { FetchResult } from "apollo-link"
+
+export type RefetchQueriesProviderFn = (...args: any[]) => string[] | PureQueryOptions[]
 
 export interface OperationVariables {
   [key: string]: any
-}
-
-export interface MutationAttributes<Data = {}, Variables = {}> {
-  data: Data | null | undefined
-  errors: GraphQLError[] | null | undefined
-  loading: boolean
-  called: boolean
-  execute: (data: { variables?: Variables }) => void
 }
 
 // Imported from react-apollo. Replace with original if it is ported back to Apollo Client
@@ -28,3 +23,10 @@ export interface FetchMoreOptions<TData, TVariables> {
 export interface FetchMoreQueryOptions<TVariables, K extends keyof TVariables> {
   variables: Pick<TVariables, K>
 }
+
+// Imported from react-apollo. Replace with original if it is ported back to Apollo Client
+export declare type MutationUpdaterFn<
+  T = {
+    [key: string]: any
+  }
+> = (proxy: DataProxy, mutationResult: FetchResult<T>) => void

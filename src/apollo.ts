@@ -1,8 +1,8 @@
 import { ActionsType } from "hyperapp"
-import { ApolloClient, MutationUpdaterFn } from "apollo-client"
+import { ApolloClient } from "apollo-client"
 
-import * as query from "./query"
-import * as mutation from "./mutation"
+import * as query from "./Query"
+import * as mutation from "./Mutation"
 
 export interface State {
   client?: ApolloClient<any>
@@ -12,13 +12,7 @@ export interface State {
 
 export interface Actions {
   initQuery: (props: query.QueryProps<any, any>) => void
-  initMutation: <Data>(
-    data: {
-      id: string
-      mutation: any
-      update: MutationUpdaterFn<Data> | undefined
-    }
-  ) => void
+  initMutation: (props: mutation.MutationProps<any, any>) => void
   query: query.Actions
   mutation: mutation.Actions
 }
@@ -42,11 +36,11 @@ export const actions: ActionsType<State, Actions> = {
       client: getClient(client)
     })
   },
-  initMutation: ({ id, mutation, update }: { id: string; mutation: any; update: MutationUpdaterFn | undefined }) => (
-    { client },
-    actions
-  ) => {
-    actions.mutation.init({ id, mutation, client: getClient(client), update })
+  initMutation: (props: mutation.MutationProps<any, any>) => ({ client }, actions) => {
+    actions.mutation.initialize({
+      props,
+      client: getClient(client)
+    })
   },
   query: query.actions,
   mutation: mutation.actions
