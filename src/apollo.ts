@@ -11,14 +11,7 @@ export interface State {
 }
 
 export interface Actions {
-  initQuery: (
-    data: {
-      id: string
-      query: any
-      variables?: any
-      notifyOnNetworkStatusChange?: boolean
-    }
-  ) => void
+  initQuery: (props: query.QueryProps<any, any>) => void
   initMutation: <Data>(
     data: {
       id: string
@@ -43,23 +36,10 @@ function getClient(client: ApolloClient<any> | undefined): ApolloClient<any> {
 }
 
 export const actions: ActionsType<State, Actions> = {
-  initQuery: ({
-    id,
-    query,
-    variables,
-    notifyOnNetworkStatusChange
-  }: {
-    id: string
-    query: any
-    variables?: any
-    notifyOnNetworkStatusChange?: boolean
-  }) => ({ client }, actions) => {
-    actions.query.init({
-      id,
-      query,
-      variables,
-      client: getClient(client),
-      notifyOnNetworkStatusChange
+  initQuery: (props: query.QueryProps<any, any>) => ({ client }, actions) => {
+    actions.query.initializeQueryObservable({
+      props,
+      client: getClient(client)
     })
   },
   initMutation: ({

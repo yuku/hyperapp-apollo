@@ -1,7 +1,7 @@
-export default function setData({ id, data }: { id: string; data: any }) {
+export default function setData({ key, data }: { key: string; data: any }) {
   return (state: any) => ({
-    [id]: {
-      ...state[id],
+    [key]: {
+      ...state[key],
       ...data
     }
   })
