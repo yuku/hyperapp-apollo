@@ -10,7 +10,6 @@ import {
   WatchQueryOptions
 } from "apollo-client"
 import { DocumentNode } from "graphql"
-import shallowEqual from "fbjs/lib/shallowEqual"
 
 import * as apollo from "./apollo"
 import addLifeCycleHandlers from "./util/addLifeCycleHandlers"
@@ -19,6 +18,8 @@ import compact from "./util/compact"
 import omit from "./util/omit"
 import resolveNode from "./util/resolveNode"
 import { OperationVariables, FetchMoreOptions, FetchMoreQueryOptions } from "./types"
+
+const shallowEqual = require("fbjs/lib/shallowEqual")
 
 export type ObservableQueryFields<Data, Variables> = Pick<
   ObservableQuery<Data>,
@@ -262,7 +263,11 @@ export function Query<Data, Variables>(props: QueryProps<Data, Variables>, child
     if (locals[props.key].hasMounted) {
       actions.apollo.query.willReceiveProps(props)
     }
-    const vnode = resolveNode(props.render(getQueryResult<Data, Variables>(props.key), children), state, actions)
+    const vnode: VNode<any> = resolveNode(
+      props.render(getQueryResult<Data, Variables>(props.key), children),
+      state,
+      actions
+    )
     vnode.attributes = addLifeCycleHandlers(
       {
         key: props.key,

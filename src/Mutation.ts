@@ -129,6 +129,7 @@ export const actions: ActionsType<State, Actions> = {
         called: true
       }
     }
+    return
   },
   onCompletedMutation: (params: { props: MutationProps<any, any>; response: FetchResult; mutationId: number }) => {
     const { onCompleted, ignoreResults } = params.props
@@ -140,9 +141,9 @@ export const actions: ActionsType<State, Actions> = {
         loading: false,
         data
       }
-    } else {
-      callOnCompleted()
     }
+    callOnCompleted()
+    return
   },
   onMutationError: (params: { props: MutationProps<any, any>; error: ApolloError; mutationId: number }) => {
     const onError = params.props.onError
@@ -153,9 +154,9 @@ export const actions: ActionsType<State, Actions> = {
         loading: false,
         error: params.error
       }
-    } else {
-      callOnError()
     }
+    callOnError()
+    return
   },
   destroy: (key: string) => state => ({ modules: omit(state.modules, key) }),
   modules: {
@@ -215,7 +216,7 @@ export function Mutation<Data = any, Variables = OperationVariables>(
       actions.apollo.initMutation(props)
       return
     }
-    const vnode = resolveNode(
+    const vnode: VNode<any> = resolveNode(
       props.render(getRenderProps(props, mutationState, actions.apollo.mutation), children),
       state,
       actions
