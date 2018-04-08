@@ -8,7 +8,7 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 
 ## [Unreleased]
 ### Changed
-- Rewrite `<Query/>` as react-apollo.
+- Remove `query` and `mutation` functions and export `<Query/>` and `<Mutation/>` directly.
 
 ### Added
 - Support `fetchMore` and `notificyNetworkStatusChange`
