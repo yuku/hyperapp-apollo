@@ -114,7 +114,9 @@ export default ({ match }) => (
                     <h4 class="subtitle is-4">Types</h4>
                     <div class="tags">{params.data.pokemon.types.map(type => <span class="tag">{type}</span>)}</div>
                     <h4 class="subtitle is-4">Weaknesses</h4>
-                    <div class="tags">{params.data.pokemon.weaknesses.map(type => <span class="tag">{type}</span>)}</div>
+                    <div class="tags">
+                      {params.data.pokemon.weaknesses.map(type => <span class="tag">{type}</span>)}
+                    </div>
                     <h4 class="subtitle is-4">Resistant</h4>
                     <div class="tags">{params.data.pokemon.resistant.map(type => <span class="tag">{type}</span>)}</div>
                   </div>

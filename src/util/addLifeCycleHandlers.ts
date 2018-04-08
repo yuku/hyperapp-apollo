@@ -17,7 +17,7 @@ export default function addLifeCycleHandlers(
   }: {
     oncreate?: (element: HTMLElement) => void
     onupdate?: (element: HTMLElement, oldAttributes: any) => void
-    onremove?: (element: HTMLElement) => void
+    onremove?: (element: HTMLElement, done: () => void) => void
     ondestroy?: (element: HTMLElement) => void
   }
 ): any {

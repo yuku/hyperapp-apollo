@@ -1,4 +1,4 @@
-import { Component, ActionsType } from "hyperapp"
+import { Component, ActionsType, VNode } from "hyperapp"
 import { DocumentNode } from "graphql"
 import { FetchResult } from "apollo-link"
 import ApolloClient, { ApolloError, PureQueryOptions, MutationUpdaterFn } from "apollo-client"
@@ -45,17 +45,27 @@ export declare type RenderProps<Data, Variables> = MutationResult<Data> & {
   runMutation: (options?: MutationOptions<Data, Variables>) => void
 }
 
-export interface MutationModuleState<Data = any> {
+export interface MutationState<Data = any> {
   called: boolean
   data?: Data
   error?: ApolloError
   loading: boolean
 }
 
+export interface MutationLocals<Data, Variables> {
+  hasMounted: boolean
+  mostRecentMutationId: number
+  props: MutationProps<Data, Variables>
+}
+
+const locals: {
+  [key: string]: MutationLocals<any, any>
+} = {}
+
 // globalState.apollo.mutation
 export interface State {
   modules: {
-    [id: string]: MutationModuleState<any>
+    [id: string]: MutationState<any>
   }
   client?: ApolloClient<any>
 }
@@ -65,11 +75,11 @@ export interface Actions {
   initialize: (params: { props: MutationProps<any, any>; client: ApolloClient<any> }) => void
   mutate: (params: { props: MutationProps<any, any>; options: MutationOptions<any> }) => Promise<FetchResult>
   onStartMutation: (params: MutationProps<any, any>) => void
-  onCompletedMutation: (params: { props: MutationProps<any, any>; response: FetchResult }) => void
-  onMutationError: (params: { props: MutationProps<any, any>; error: ApolloError }) => void
+  onCompletedMutation: (params: { props: MutationProps<any, any>; response: FetchResult; mutationId: number }) => void
+  onMutationError: (params: { props: MutationProps<any, any>; error: ApolloError; mutationId: number }) => void
   destroy: (key: string) => void
   modules: {
-    setData: (data: { key: string; data: Partial<MutationModuleState<any>> }) => void
+    setData: (data: { key: string; data: Partial<MutationState<any>> }) => void
   }
 }
 
@@ -78,7 +88,25 @@ export const state: State = {
 }
 
 export const actions: ActionsType<State, Actions> = {
-  initialize: params => ({ client: params.client }),
+  initialize: (params: { props: MutationProps<any, any>; client: ApolloClient<any> }) => (_, actions) => {
+    locals[params.props.key] = {
+      hasMounted: false,
+      mostRecentMutationId: 0,
+      props: params.props
+    }
+    actions.modules.setData({
+      key: params.props.key,
+      data: {
+        loading: false,
+        called: false,
+        error: undefined,
+        data: undefined
+      }
+    })
+    return {
+      client: params.client
+    }
+  },
   mutate: (params: { props: MutationProps<any, any>; options: MutationOptions<any> }) => state => {
     const { mutation, variables, optimisticResponse, update } = params.props
     const refetchQueries = params.options.refetchQueries || params.props.refetchQueries
@@ -92,8 +120,8 @@ export const actions: ActionsType<State, Actions> = {
     })
   },
   onStartMutation: (params: MutationProps) => state => {
-    const moduleState = state.modules[params.key]
-    if (!moduleState.loading && !params.ignoreResults) {
+    const mutationState = state.modules[params.key]
+    if (!mutationState.loading && !params.ignoreResults) {
       return {
         loading: true,
         error: undefined,
@@ -102,19 +130,31 @@ export const actions: ActionsType<State, Actions> = {
       }
     }
   },
-  onCompletedMutation: (params: { props: MutationProps<any, any>; response: FetchResult }) => {
-    if (params.props.ignoreResults) {
-      return
-    }
-    const onCompleted = params.props.onCompleted
-    if (onCompleted) {
-      onCompleted(params.response.data)
+  onCompletedMutation: (params: { props: MutationProps<any, any>; response: FetchResult; mutationId: number }) => {
+    const { onCompleted, ignoreResults } = params.props
+    const data = params.response.data
+    const callOnCompleted = () => (onCompleted ? onCompleted(data) : null)
+    if (isMostRecentMutation(params.props.key, params.mutationId) && !ignoreResults) {
+      setTimeout(callOnCompleted, 10) // huristic
+      return {
+        loading: false,
+        data
+      }
+    } else {
+      callOnCompleted()
     }
   },
-  onMutationError: (params: { props: MutationProps<any, any>; error: ApolloError }) => {
+  onMutationError: (params: { props: MutationProps<any, any>; error: ApolloError; mutationId: number }) => {
     const onError = params.props.onError
-    if (onError) {
-      onError(params.error)
+    const callOnError = () => (onError ? onError(params.error) : null)
+    if (isMostRecentMutation(params.props.key, params.mutationId)) {
+      setTimeout(callOnError, 10) // huristic
+      return {
+        loading: false,
+        error: params.error
+      }
+    } else {
+      callOnError()
     }
   },
   destroy: (key: string) => state => ({ modules: omit(state.modules, key) }),
@@ -123,9 +163,18 @@ export const actions: ActionsType<State, Actions> = {
   }
 }
 
+function generateNewMutationId(key: string) {
+  locals[key].mostRecentMutationId = locals[key].mostRecentMutationId + 1
+  return locals[key].mostRecentMutationId
+}
+
+function isMostRecentMutation(key: string, mutationId: number) {
+  return locals[key].mostRecentMutationId === mutationId
+}
+
 function getRenderProps<Data, Variables>(
   props: MutationProps<Data, Variables>,
-  state: MutationModuleState<Data>,
+  state: MutationState<Data>,
   actions: Actions
 ): RenderProps<Data, Variables> {
   return {
@@ -135,17 +184,19 @@ function getRenderProps<Data, Variables>(
     error: state.error,
     runMutation: (options?: MutationOptions<Data, Variables>) => {
       actions.onStartMutation(props)
+      const mutationId = generateNewMutationId(props.key)
       return actions
         .mutate({ props, options: options || {} })
         .then(response => {
           actions.onCompletedMutation({
             props,
-            response
+            response,
+            mutationId
           })
           return response
         })
         .catch(error => {
-          actions.onMutationError({ props, error })
+          actions.onMutationError({ props, error, mutationId })
           if (!props.onError) {
             throw error
           }
@@ -159,13 +210,13 @@ export function Mutation<Data = any, Variables = OperationVariables>(
   children: any
 ) {
   return (state: { apollo: apollo.State }, actions: { apollo: apollo.Actions }) => {
-    const moduleState: MutationModuleState<Data> | void = state.apollo.mutation.modules[props.key]
-    if (!moduleState) {
+    const mutationState: MutationState<Data> | void = state.apollo.mutation.modules[props.key]
+    if (!mutationState) {
       actions.apollo.initMutation(props)
       return
     }
     const vnode = resolveNode(
-      props.render(getRenderProps(props, moduleState, actions.apollo.mutation), children),
+      props.render(getRenderProps(props, mutationState, actions.apollo.mutation), children),
       state,
       actions
     )
@@ -175,10 +226,15 @@ export function Mutation<Data = any, Variables = OperationVariables>(
         key: props.key
       },
       {
+        oncreate() {
+          locals[props.key].hasMounted = true
+        },
         ondestroy() {
           actions.apollo.mutation.destroy(props.key)
         }
       }
     )
+    locals[props.key].props = props
+    return vnode
   }
 }

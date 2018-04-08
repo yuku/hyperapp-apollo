@@ -28,6 +28,7 @@
   "dependencies": {
     "apollo-cache": "^1.1.7",
     "apollo-link": "^1.2.1",
+    "fbjs": "^0.8.16",
     "hyperapp": "^1.2.5"
   },
   "devDependencies": {
