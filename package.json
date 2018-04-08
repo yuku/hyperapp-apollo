@@ -1,7 +1,7 @@
 {
   "name": "hyperapp-apollo",
   "description": "Apollo/GraphQL integration for Hyperapp",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "dist/index.mjs",

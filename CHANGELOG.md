@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 
 ## [Unreleased]
+
+## [0.4.0] - 2018-04-08
 ### Changed
 - Remove `query` and `mutation` functions and export `<Query/>` and `<Mutation/>` directly.
 
@@ -55,7 +57,8 @@ This change log adheres to [keepachangelog.com](http://keepachangelog.com).
 ### Added
 - Initial release.
 
-[Unreleased]: https://github.com/yuku-t/hyperapp-apollo/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/yuku-t/hyperapp-apollo/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/yuku-t/hyperapp-apollo/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/yuku-t/hyperapp-apollo/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/yuku-t/hyperapp-apollo/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/yuku-t/hyperapp-apollo/compare/v0.1.0...v0.2.0
